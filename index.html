@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700,900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="fstyle.css">
+
+    <link rel="stylesheet" href="owl.carousel.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="bootstrap.min.css">
+    
+    <!-- Style -->
+    <link rel="stylesheet" href="mstyle.css">
+
+    <title>Martech Cloud - Blacklist Contacts</title>
+  </head>
+  <body>
+  
+
+  <div class="content">
+    
+    <div class="container">
+
+      
+      <div class="row justify-content-center">
+        <div class="col-md-10">
+          
+          <div class="row align-items-center">
+            <div class="col-lg-7 mb-5 mb-lg-0">
+
+              <h1 class="mb-5"> <b>Blacklist Contacts</b></h1>
+              <form class="border-right pr-5 mb-5" method="post" id="contactForm" name="contactForm" action="https://script.google.com/macros/s/AKfycby5h3Q63d3jhzMv5_tPuctffPkg64wQrfNj5O88RVZqZ0pgNi49UB91E3NO_rjIMy0k/exec">  
+                <div class="alert" id="alertMessage"></div>
+                <div class="alert1" id="alertMessage2"></div>           
+                <div class="row">
+                  <div class="col-md-6 form-group">
+                    <input type="radio"  id="emailRadio" name="blacklist_option" class="form-radio text-blue-500" value="email" onclick="toggleInput('email')">
+                    <span class="ml-2">Email</span>
+                  </div>
+                  <div class="col-md-6 form-group">
+                    <input type="radio"  id="phoneRadio" name="blacklist_option" class="form-radio text-blue-500" value="phone" onclick="toggleInput('phone')">
+                    <span class="ml-2">Phone</span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 form-group">
+                    <input type="text" class="form-control" name="email" id="contact" placeholder="Enter contact" onblur="validateInput()" disabled>
+                    <p id="validationMessage" class="text-red-500 text-sm mt-1"></p>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-12 form-group">
+                    <textarea class="form-control" name="message" id="reason" cols="30" rows="1" placeholder="Enter Blacklist Reason"></textarea>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-12 form-group">
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Enter password">
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="loading-spinner" id="loadingSpinner"></div>
+                    <input type="submit" value="Blacklist Contact" id = "submitButton" class="btn btn-primary rounded-0 py-2 px-4">
+                    <span class="submitting"></span>
+                  </div>
+                </div>
+              </form>
+
+              <div id="form-message-warning mt-4"></div> 
+              <div id="form-message-success">
+                Your message was sent, thank you!
+              </div>
+
+            </div>
+            <div class="col-lg-4 ml-auto">
+              <h3 class="mb-4">Whitelisting Process</h3>
+              <p> Initiate a request to Martech Cloud using the provided email address. <b>service@martechcloud.in</b><br>
+                <br>
+                Attach a CSV file containing the list of contacts that need to be whitelist.<br>
+                <br>
+                After submitting the request, the specified contacts will be removed from the blacklist within a few hours.
+              </p>
+              <p><a href="mailto:service@martechcloud.in">Send Request</a></p>
+            </div>
+          </div>
+        </div>  
+        </div>
+      </div>
+  </div>
+  
+  <script>
+    document.getElementById("contactForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+        var contact = document.getElementById('contact').value;
+        var reason = document.getElementById('reason').value;
+        var password = document.getElementById('password').value;
+
+        // Check if any of the input fields are empty
+        if (contact === '' || reason === '' || password === '') {
+          alertMessage.style.display = "block";
+          alertMessage.innerHTML = "All fields are required.";
+          setTimeout(function () {
+                    alertMessage.style.display = "none";
+            }, 1000);
+            return; // Stop execution if any field is empty
+        }
+
+        var loadingSpinner = document.getElementById("loadingSpinner");
+        loadingSpinner.style.display = "inline-block";
+
+        // Create a FormData object to send the form data
+        var formData = new FormData();
+        formData.append('contact', contact);
+        formData.append('reason', reason);
+        formData.append('password', password);
+        formData.append('phoneRadio', phoneRadio);
+
+        // Send the data to the Google Apps Script web app
+        fetch('https://script.google.com/macros/s/AKfycby5h3Q63d3jhzMv5_tPuctffPkg64wQrfNj5O88RVZqZ0pgNi49UB91E3NO_rjIMy0k/exec', {
+                method: "POST",
+                body: formData,
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.redirectUrl) {
+                  loadingSpinner.style.display = "none";
+					        alertMessage2.style.display = "block";
+                  alertMessage2.innerHTML = "Contact has been added to the blacklist successfully.";
+                  setTimeout(function () {
+                location.reload();
+            }, 2000);
+
+                } else {
+                  loadingSpinner.style.display = "none";
+					        alertMessage.style.display = "block";
+                  alertMessage.innerHTML = "Invalid Password";
+                  setTimeout(function () {
+                    alertMessage.style.display = "none";
+            }, 2000);
+                  
+                }
+            })
+            .catch(function(error) {
+                console.error("Error:", error);
+				        loadingSpinner.style.display = "none";
+            });
+        });
+    </script>
+
+
+  <script>
+    // Function to toggle input field based on radio button selection
+    function toggleInput(option) {
+        const contactInput = document.getElementById('contact');
+        const validationMessage = document.getElementById('validationMessage');
+        validationMessage.textContent = ''; // Clear validation message
+
+        if (option === 'email') {
+            phoneRadio = 'email'
+            contactInput.placeholder = 'Enter Email';
+            contactInput.type = 'email';
+            contactInput.disabled = false;
+        } else if (option === 'phone') {
+            phoneRadio = 'phone'
+            contactInput.placeholder = 'Enter Phone';
+            contactInput.type = 'tel';
+            contactInput.disabled = false;
+        } else {
+            contactInput.value = '';
+            contactInput.disabled = true;
+        }
+    }
+
+    // Function to validate the input (email or phone)
+    function validateInput() {
+            const contactInput = document.getElementById('contact');
+            const validationMessage = document.getElementById('validationMessage');
+
+            if (contactInput.type === 'email') {
+                // Email validation
+                const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+                if (!emailPattern.test(contactInput.value)) {
+                    validationMessage.textContent = 'Please enter a valid email address';
+                } else {
+                    validationMessage.textContent = '';
+                }
+            } else if (contactInput.type === 'tel') {
+                // Phone validation (you can customize this as needed)
+                const phonePattern = /^\d{10}$/; // Assuming 10-digit phone number
+                if (!phonePattern.test(contactInput.value)) {
+                    validationMessage.textContent = 'Please enter a valid phone number';
+                } else {
+                    validationMessage.textContent = '';
+                }
+            }
+        }
+    </script>
+
+
+
+
+
+  
+    
+    
+
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.validate.min.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
